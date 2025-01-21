@@ -1,0 +1,113 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ORG
+  MEMBER
+}
+
+model User {
+  id                    String   @id @default(uuid())
+  name                  String
+  email                 String   @unique
+  zipcode               String
+  address               String
+  number                String   @default("")
+  aditional_description String   @default("")
+  city                  String
+  state                 String
+  whatsapp              String   @unique
+  password_hash         String
+  role                  Role
+  created_at            DateTime @default(now())
+  pets                  Pet[]
+
+  @@map("users")
+}
+
+enum Age {
+  Filhote
+  Adulto
+  Idoso
+}
+
+enum Size {
+  Pequenino
+  Médio
+  Grande
+}
+
+enum Energy {
+  Baixa
+  Média
+  Alta
+}
+
+enum Independency {
+  Baixo
+  Médio
+  Alto
+}
+
+enum Environment {
+  Amplo
+  Pequeno
+  Médio
+  Externo
+  Interno
+}
+
+model Pet {
+  id           String       @id @default(uuid())
+  name         String
+  about        String
+  age          Age
+  size         Size
+  energy       Energy
+  independency Independency
+  environment  Environment
+  created_at   DateTime     @default(now())
+
+  user    User   @relation(fields: [user_id], references: [id])
+  user_id String
+
+  photos       Photo[]
+  requirements Requirement[]
+
+  @@map("pets")
+}
+
+model Photo {
+  id         String   @id @default(uuid())
+  name       String
+  extension  String
+  created_at DateTime @default(now())
+
+  pet    Pet    @relation(fields: [pet_id], references: [id])
+  pet_id String
+
+  @@map("photos")
+}
+
+model Requirement {
+  id         String   @id @default(uuid())
+  name       String
+  created_at DateTime @default(now())
+
+  pet    Pet    @relation(fields: [pet_id], references: [id])
+  pet_id String
+
+  @@map("requirements")
+}
